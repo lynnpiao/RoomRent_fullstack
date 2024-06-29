@@ -1,0 +1,113 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id Int @id @default(autoincrement()) @map("userId")
+  name String
+  email String @db.VarChar(100) @unique
+  password  String 
+  tenant Tenant?
+  manager Manager?
+}
+
+model Tenant{
+  id Int @id @default(autoincrement()) @map("tenantId")
+  userId Int @unique
+  user User @relation(fields: [userId], references: [id])
+  likes Like[]
+}
+
+model Manager{
+  id Int @id @default(autoincrement()) @map("managerId")
+  userId Int @unique
+  user User @relation(fields: [userId], references: [id])
+  apartments ManageApartment[]
+}
+
+model Apartment{
+  id Int @id @default(autoincrement()) @map("apartmentId")
+  address String
+  name String
+  description String
+  zipCode String?
+  contact_email String  @db.VarChar(100) @unique
+  contact_phone String?  @db.VarChar(100) @unique
+  managers ManageApartment[]
+  rooms Room[]
+  amenities ApartmentAmenity[]
+}
+
+model Room{
+  id Int @id @default(autoincrement()) @map("roomId")
+  aptNumber Int
+  sqFeet Int
+  type String
+  availableDate DateTime  @default(now())
+  floor Int?
+  minLeaseLength Int?
+  rentPerMonth Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  apartmentId Int?
+  apartment Apartment?  @relation(fields: [apartmentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  likes Like[]
+  amenities RoomAmenity[]
+}
+
+model Amenity{
+  id Int @id @default(autoincrement()) @map("amenityId")
+  name String
+  category String
+  rooms RoomAmenity[]
+  apartments ApartmentAmenity[]
+}
+
+model ManageApartment{
+  managerId Int
+  manager Manager @relation(fields: [managerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  apartmentId Int
+  apartment Apartment @relation(fields: [apartmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([managerId, apartmentId])
+}
+
+model Like{
+  roomId Int
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  tenantId Int
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([roomId, tenantId])
+}
+
+model RoomAmenity{
+  roomId Int 
+  room Room @relation(fields: [roomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  amenityId Int
+  amenity Amenity @relation(fields: [amenityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([roomId, amenityId])
+}
+
+model ApartmentAmenity{
+  apartmentId Int
+  apartment Apartment @relation(fields: [apartmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  amenityId Int
+  amenity Amenity @relation(fields: [amenityId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@id([apartmentId, amenityId])
+}

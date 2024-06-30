@@ -1,0 +1,255 @@
+const { PrismaClient } = require('@prisma/client');
+const { validateAmenities, validateApartmentAmenities, validateRoomAmenities } = require('../middlewares/SchemaMiddleware')
+const prisma = new PrismaClient();
+const Joi = require('joi');
+
+
+// get AllAmenities
+const getAmenities = async (req, res) => {
+    try {
+        const amenities = await prisma.amenity.findMany()
+
+        if (amenities.length === 0) {
+            return res.status(404).json({ msg: 'No amenities found' });
+        }
+        res.status(200).json(amenities)
+    } catch (error) {
+        res.status(500).json({ msg: error.message })
+    }
+}
+
+// get AmenitiesByApartment
+const getAmenitiesByApartment = async (req, res) => {
+    const { apartmentId } = req.params;
+
+    try {
+        // Validate apartmentId is a number
+        if (isNaN(parseInt(apartmentId))) {
+            return res.status(400).json({ msg: 'Apartment ID must be a valid number.' });
+        }
+
+        const amenities = await prisma.apartmentAmenity.findMany({
+            where: {
+                apartmentId: parseInt(apartmentId),
+            },
+            include: {
+                amenity: true,
+            },
+        });
+
+        if (!amenities || amenities.length === 0) {
+            return res.status(404).json({ msg: `No amenities found for Apartment ID ${apartmentId}.` });
+        }
+
+        // Extract only the amenity details
+        const amenityDetails = amenities.map(item => item.amenity);
+
+        res.status(200).json(amenityDetails);
+    } catch (error) {
+        res.status(500).json({ msg: 'Internal server error.' });
+    }
+
+}
+// get AmenitiesByRoom
+const getAmenitiesByRoom = async (req, res) => {
+    const { apartmentId } = req.params;
+
+    try {
+        // Validate apartmentId is a number
+        if (isNaN(parseInt(apartmentId))) {
+            return res.status(400).json({ msg: 'Apartment ID must be a valid number.' });
+        }
+
+        const amenities = await prisma.roomAmenity.findMany({
+            where: {
+                apartmentId: parseInt(apartmentId),
+            },
+            include: {
+                amenity: true,
+            },
+        });
+
+        if (!amenities || amenities.length === 0) {
+            return res.status(404).json({ msg: `No amenities found for Apartment ID ${apartmentId}.` });
+        }
+
+        // Extract only the amenity details
+        const amenityDetails = amenities.map(item => item.amenity);
+
+        res.status(200).json(amenityDetails);
+    } catch (error) {
+        res.status(500).json({ msg: 'Internal server error.' });
+    }
+
+}
+
+// create Amenity
+const createAmenities = async (req, res) => {
+    const { amenities } = req.body
+
+    try {
+        // Validate amenities array
+        if (!Array.isArray(amenities) || amenities.length === 0) {
+            return res.status(400).json({ msg: 'Amenities must be provided as a non-empty array.' });
+        }
+
+        // Create amenities in the database
+        const createdAmenities = await prisma.amenity.createMany({
+            data: amenities,
+        });
+
+        res.status(201).json({ msg: 'Amenities created successfully.', amenities: createdAmenities });
+    } catch (error) {
+        res.status(500).json({ msg: 'Failed to create amenities.', error: error.message });
+    }
+};
+
+
+// create AmenitiesByApartment
+const createAmenitiesByApartment = async (req, res) => {
+    const { apartmentId } = req.params
+    const apartmentAmenities = req.body
+    try {
+        if (isNaN(parseInt(apartmentId))) {
+            return res.status(400).json({ msg: 'Apartment ID must be a valid number.' });
+        }
+
+        if (!Array.isArray(apartmentAmenities) || apartmentAmenities.length === 0) {
+            return res.status(400).json({ msg: 'Amenities must be provided as a non-empty array.' });
+        }
+
+        // Create an array of objects to pass to createMany
+        const data = apartmentAmenities.map(amenityId => ({
+            apartmentId: parseInt(apartmentId),
+            amenityId: parseInt(amenityId),
+        }));
+
+        const createdApartmentAmenities = await prisma.apartmentAmenity.createMany({
+            data: data,
+        })
+        res.status(201).json({ msg: 'Apartment amenities created successfully.', apartmentAmenities: createdApartmentAmenities });
+
+    } catch (error) {
+        res.status(500).json({ msg: `Failed to create amenities for apartmentID. ${apartmentId}.`, error: error.message });
+    }
+}
+
+
+// create AmenitiesByRoom
+const createAmenitiesByRoom = async (req, res) => {
+    const { roomId } = req.params
+    const roomAmenities = req.body
+    try {
+        if (isNaN(parseInt(roomId))) {
+            return res.status(400).json({ msg: 'Room ID must be a valid number.' });
+        }
+
+        if (!Array.isArray(roomAmenities) || roomAmenities.length === 0) {
+            return res.status(400).json({ msg: 'Amenities must be provided as a non-empty array.' });
+        }
+
+        // Create an array of objects to pass to createMany
+        const data = roomAmenities.map(amenityId => ({
+            roomId: parseInt(roomId),
+            amenityId: parseInt(amenityId),
+        }));
+
+        const createdRoomAmenities = await prisma.roomAmenity.createMany({
+            data: data,
+        })
+        res.status(201).json({ msg: 'Room amenities created successfully.', roomAmenities: createdRoomAmenities });
+
+    } catch (error) {
+        res.status(500).json({ msg: `Failed to create amenities for roomID. ${roomId}.`, error: error.message });
+    }
+}
+
+// Define Joi schema for validation
+const amenityIdsSchema = Joi.array().items(Joi.number().integer().required()).min(1);
+
+
+// delete Amenities
+const deleteAmenities = async (req, res) => {
+    const {deleteIds} = req.body
+
+    try {
+        // Validate request body using Joi
+        const { error } = amenityIdsSchema.validate(deleteIds);
+        if (error) {
+            return res.status(400).json({ msg: 'Invalid request data.', error: error.details[0].message });
+        }
+
+        const deleteAmenities = await prisma.amenity.deleteMany({
+            where: {
+                id: {
+                    in: deleteIds.map(id => parseInt(id)),
+                },
+            },
+        });
+
+        if (!deleteAmenities || deleteAmenities.count === 0) {
+            return res.status(404).json({ error: 'Amenities not found' });
+        }
+        res.status(200).json({ msg: 'Delete Amenities successfully', deleteAmenities });
+    } catch (error) {
+        res.status(500).json({ msg: 'Failed to delete amenities', error: error.message });
+    }
+}
+
+
+// delete AmenityByApartment
+const deleteAmenityByApartment = async (req, res) => {
+    const { apartmentId, amenityId } = req.params
+    try {
+        if (isNaN(parseInt(apartmentId)) || isNaN(parseInt(amenityId))) {
+            return res.status(400).json({ msg: 'Apartment ID and Amenity ID must be a valid number.' });
+        }
+
+        const deleteAmenity = await prisma.apartmentAmenity.delete({
+            where: {
+                apartmentId_amenityId: {
+                    apartmentId: parseInt(apartmentId),
+                    amenityId: parseInt(amenityId),
+                },
+            },
+        });
+        res.status(200).json({ msg: 'Delete Amenities successfully', deleteAmenity });
+    } catch (error) {
+        res.status(500).json({ msg: `Failed to delete amenity ${amenityId} from apartment ${apartmentId}`, error: error.message });
+    }
+}
+// delete AmenityByRoom
+
+const deleteAmenityByRoom = async (req, res) => {
+    const { roomId, amenityId } = req.params
+    try {
+        if (isNaN(parseInt(roomId)) || isNaN(parseInt(amenityId))) {
+            return res.status(400).json({ msg: 'Room ID and Amenity ID must be a valid number.' });
+        }
+
+        const deleteAmenity = await prisma.roomAmenity.delete({
+            where: {
+                roomId_amenityId: {
+                    roomId: parseInt(roomId),
+                    amenityId: parseInt(amenityId),
+                },
+            },
+        });
+        res.status(200).json({ msg: 'Delete Amenities successfully', deleteAmenity });
+    } catch (error) {
+        res.status(500).json({ msg: `Failed to delete amenity ${amenityId} from room ${roomId}`, error: error.message });
+    }
+}
+
+
+module.exports = {
+    getAmenities,
+    getAmenitiesByApartment,
+    getAmenitiesByRoom,
+    createAmenities: [validateAmenities, createAmenities],
+    createAmenitiesByApartment: [validateApartmentAmenities, createAmenitiesByApartment],
+    createAmenitiesByRoom: [validateRoomAmenities, createAmenitiesByRoom],
+    deleteAmenities,
+    deleteAmenityByApartment,
+    deleteAmenityByRoom
+}

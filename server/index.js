@@ -2,8 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const ApartmentRoute = require('./routes/ApartmentRoute');
-
-
+const AmenityRoute = require('./routes/AmenityRoute');
+const RoomRoute = require('./routes/RoomRoute')
+const LikeRoute = require('./routes/LikeRoute')
 
 // express init
 const app = express();
@@ -17,6 +18,9 @@ app.use(morgan("dev"));
 
 //requests
 app.use(ApartmentRoute);
+app.use(AmenityRoute);
+app.use(RoomRoute);
+app.use(LikeRoute);
 
 
 // Connect to the database and start the server
@@ -24,4 +28,4 @@ app.listen(port, () => {
     console.log(`Server listening on port ${port}`)
   })
   
-  module.exports = app;
+module.exports = app;

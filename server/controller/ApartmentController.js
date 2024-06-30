@@ -6,7 +6,6 @@ const prisma = new PrismaClient()
 // get ApartmentByRoom
 const getApartmentByRoom = async(req, res)=>{
     const { roomId } = req.params;
-
     try {
         if (isNaN(parseInt(roomId))) {
             return res.status(400).json({ msg: 'Room ID must be a valid number.' });
@@ -32,7 +31,6 @@ const getApartmentByRoom = async(req, res)=>{
 }
 
 // get ApartmentsByManager 
-
 const getApartmentsByManager = async(req, res)=>{
     const { managerId } = req.params;
 
@@ -57,7 +55,7 @@ const getApartmentsByManager = async(req, res)=>{
         if (!managerWithApartments){
             return res.status(404).json({ msg: `Apartment with managerID ${managerId} not found.`});
         }
-        const apartments = managerWithApartments.apartments.map(ma => ma.apartment);
+        const apartments = managerWithApartments.apartments.map(item => item.apartment);
         res.status(200).json(apartments)
     } catch (error) {
         res.status(500).json({ msg: error.message })
@@ -71,7 +69,7 @@ const createApartment = async (req, res) => {
     const {address, name, description, zipCode, contact_email, contact_phone} = req.body
 
     try {
-        const apartment = await prisma.apartment.create({
+        const createdApartment = await prisma.apartment.create({
             data: {
                 address,
                 name,
@@ -81,7 +79,7 @@ const createApartment = async (req, res) => {
                 contact_phone: contact_phone || null
             },
         })
-        res.status(201).json({ msg: 'Create Apartment successfully', apartment})
+        res.status(201).json({ msg: 'Create Apartment successfully', createdApartment})
     } catch (error) {
         res.status(400).json({ msg: error.message })
     }
@@ -90,15 +88,16 @@ const createApartment = async (req, res) => {
 // update Apartment
 const updateApartment = async (req, res) => {
     const id = req.params.id;
-    const idInt = parseInt(id, 10);
+    const idInt = parseInt(id);
     const {description, contact_email, contact_phone} = req.body
 
-    if (isNaN(idInt) || idInt <= 0 ) {
-        return res.status(400).json({ error: 'Invalid ApartmentId' });
-    }
-
     try {
-        const apartment = await prisma.apartment.update({
+
+        if (isNaN(idInt) || idInt <= 0 ) {
+            return res.status(400).json({ error: 'Invalid ApartmentId' });
+        }
+
+        const updatedApartment = await prisma.apartment.update({
             where: {
                     id: idInt,
             },
@@ -108,7 +107,7 @@ const updateApartment = async (req, res) => {
                 contact_phone: contact_phone || null
             },
         })
-        res.status(200).json({ msg: 'Apartment updated successfully', apartment})
+        res.status(200).json({ msg: 'Apartment updated successfully', updatedApartment})
     } catch (error) {
         res.status(500).json({ msg: error.message })
     }
@@ -117,23 +116,24 @@ const updateApartment = async (req, res) => {
 // delete Apartment
 const deleteApartment = async (req, res) => {
     const id = req.params.id;
-    const idInt = parseInt(id, 10);
-
-    if (isNaN(idInt) || idInt <= 0 ) {
-        return res.status(400).json({ error: 'Invalid ApartmentId' });
-    }
+    const idInt = parseInt(id);
 
     try {
-        const deleteApartment = await prisma.apartment.delete({
+
+        if (isNaN(idInt) || idInt <= 0 ) {
+            return res.status(400).json({ error: 'Invalid ApartmentId' });
+        }
+
+        const deletedApartment = await prisma.apartment.delete({
             where: {
                 id: idInt,
             },
         });
 
-        if (!deleteApartment) {
+        if (!deletedApartment) {
             return res.status(404).json({ error: 'Apartment not found' });
         }
-        res.status(200).json({ msg: 'Delete Apartment successfully', deleteApartment}); 
+        res.status(200).json({ msg: 'Delete Apartment successfully', deletedApartment}); 
     } catch (error) {
         res.status(500).json({ msg: error.message })
     }

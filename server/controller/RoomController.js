@@ -1,7 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const {validateRoom, validatePartialRoom} = require('../middlewares/SchemaMiddleware')
 const prisma = new PrismaClient();
-const Joi = requie('joi');
+const Joi = require('joi');
 
 
 // get AllRooms
@@ -60,11 +60,11 @@ const getRoomById = async (req, res) => {
         if (!room) {
             return res.status(404).json({ msg: 'No rooms found' });
         }
-        const roomWithApartment = room.map(rm => ({
-            ...rm,
-            name: rm.apartment ? rm.apartment.name : null,
-            contact_email: rm.apartment ? rm.apartment.contact_email : null,
-        }));
+        const roomWithApartment = {
+            ...room,
+            name: room.apartment ? room.apartment.name : null,
+            contact_email: room.apartment ? room.apartment.contact_email : null,
+        };
 
         res.status(200).json(roomWithApartment)
     } catch (error) {
@@ -281,7 +281,7 @@ const deleteRoom = async (req, res) => {
             return res.status(400).json({ error: 'Invalid RoomId' });
         }
 
-        const deletedRoom = await prisma.apartment.delete({
+        const deletedRoom = await prisma.room.delete({
             where: {
                 id: idInt,
             },

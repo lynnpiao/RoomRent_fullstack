@@ -2,14 +2,14 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const toggleLike = async (req, res) => {
-    const {roomId} = req.body;
-    const tenantId = req.user.id;
+    const {roomId, userId} = req.body;
+
     try {
         const found = await prisma.like.findUnique({
             where: {
-                roomId_tenantId: {
+                roomId_userId: {
                     roomId: parseInt(roomId),
-                    tenantId: parseInt(tenantId),
+                    userId: parseInt(userId),
                 },
             },
         });
@@ -18,16 +18,16 @@ const toggleLike = async (req, res) => {
             await prisma.like.create({
                 data: {
                     roomId: parseInt(roomId),
-                    tenantId: parseInt(tenantId),
+                    userId: parseInt(userId),
                 },
             });
             res.json({ liked: true });
         } else {
             await prisma.like.delete({
                 where: {
-                    roomId_tenantId: {
+                    roomId_userId: {
                         roomId: parseInt(roomId),
-                        tenantId: parseInt(tenantId),
+                        userId: parseInt(userId),
                     },
                 },
             });

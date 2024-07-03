@@ -14,29 +14,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// only with the role of manager can execute CUD for department and room
+// only with the role of tenant can execute Like table
 
 model User {
   id Int @id @default(autoincrement()) @map("userId")
-  name String
   email String @db.VarChar(100) @unique
-  password  String 
-  tenant Tenant?
-  manager Manager?
-}
-
-model Tenant{
-  id Int @id @default(autoincrement()) @map("tenantId")
-  userId Int @unique
-  user User @relation(fields: [userId], references: [id])
+  password  String
+  role String
   likes Like[]
-}
-
-model Manager{
-  id Int @id @default(autoincrement()) @map("managerId")
-  userId Int @unique
-  user User @relation(fields: [userId], references: [id])
   apartments ManageApartment[]
 }
+
 
 model Apartment{
   id Int @id @default(autoincrement()) @map("apartmentId")
@@ -66,6 +55,7 @@ model Room{
   apartment Apartment?  @relation(fields: [apartmentId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   likes Like[]
   amenities RoomAmenity[]
+  @@unique([aptNumber, apartmentId])
 }
 
 model Amenity{
@@ -77,21 +67,21 @@ model Amenity{
 }
 
 model ManageApartment{
-  managerId Int
-  manager Manager @relation(fields: [managerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId Int
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   apartmentId Int
   apartment Apartment @relation(fields: [apartmentId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  @@id([managerId, apartmentId])
+  @@id([userId, apartmentId])
 }
 
 model Like{
   roomId Int
   room Room @relation(fields: [roomId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  tenantId Int
-  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  userId Int
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
-  @@id([roomId, tenantId])
+  @@id([roomId, userId])
 }
 
 model RoomAmenity{

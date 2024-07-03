@@ -1,5 +1,25 @@
 const Joi = require("joi");
 
+
+
+//Validation For create User
+// Joi validation schema 
+const userSchema = Joi.object({
+    email: Joi.string().email().max(100).required(),
+    password: Joi.string().required(),
+    role: Joi.string().required(),
+});
+
+// Middleware for validating request data
+const validateUser = (req, res, next) => {
+    const { error } = userSchema.validate(req.body);
+    if (error) {
+        return res.status(400).json({ msg: error.details[0].message });
+    }
+    next();
+}
+
+
 //Validation For create Apartment
 // Joi validation schema 
 const apartmentSchema = Joi.object({
@@ -116,6 +136,7 @@ const validatePartialRoom = (req, res, next) => {
 
 
 module.exports = { 
+    validateUser,
     validateApartment,
     validatePartialApartment,
     validateAmenities,

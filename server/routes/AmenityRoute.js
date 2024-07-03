@@ -9,6 +9,7 @@ const {getAmenities,
     deleteAmenities,
     deleteAmenityByApartment,
     deleteAmenityByRoom} = AmenityController;
+const { validateToken, validateRole } = require('../middlewares/AuthMiddleware')
 
 
 const router = express.Router()
@@ -18,7 +19,7 @@ router.get('/api/amenities', getAmenities)
 router.get('/api/amenities/apartment/:apartmentId', getAmenitiesByApartment)
 router.get('/api/amenities/room/:roomId', getAmenitiesByRoom)
 router.post('/api/amenities', createAmenities)
-router.post('/api/amenities/apartment/:apartmentId', createAmenitiesByApartment)
+router.post('/api/amenities/apartment/:apartmentId', validateToken, validateRole('manager'), createAmenitiesByApartment)
 router.post('/api/amenities/room/:roomId', createAmenitiesByRoom)
 router.delete('/api/apartments', deleteAmenities)
 router.delete('/api/apartments/apartment/:apartmentId/:amenityId', deleteAmenityByApartment)

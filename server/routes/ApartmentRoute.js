@@ -14,7 +14,7 @@ const { validateToken, validateRole } = require('../middlewares/AuthMiddleware')
 const router = express.Router()
 
 
-// only getApartmentByRoom is not tested 
+// all tested
 router.get('/api/apartments', getApartments)
 router.get('/api/apartments/:roomId', getApartmentByRoom) 
 router.get('/api/apartments/manage/:userId', getApartmentsByManager)

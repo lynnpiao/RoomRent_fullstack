@@ -63,10 +63,10 @@ const amenitySchema = Joi.object({
     category: Joi.string().required()
   });
   
-const amenitiesSchema = Joi.array().items(amenitySchema).min(1);
+// const amenitiesSchema = Joi.array().items(amenitySchema).min(1);
 
-const validateAmenities = (req, res, next) => {
-    const { error } = amenitiesSchema.validate(req.body);
+const validateAmenity = (req, res, next) => {
+    const { error } = amenitySchema.validate(req.body);
     if (error) {
         return res.status(400).json({ msg: error.details[0].message });
     }
@@ -139,7 +139,7 @@ module.exports = {
     validateUser,
     validateApartment,
     validatePartialApartment,
-    validateAmenities,
+    validateAmenity,
     validateApartmentAmenities,
     validateRoomAmenities,
     validateRoom,

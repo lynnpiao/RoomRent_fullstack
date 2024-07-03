@@ -6,7 +6,7 @@ const {createAccount, loginAccount, auth} = UserController;
 
 const router = express.Router()
 
-// all test in postman, works fine
+// all tested
 router.post('/api/user', createAccount)
 router.post('/api/user/login', loginAccount)
 router.get('/api/user/auth', validateToken, auth)

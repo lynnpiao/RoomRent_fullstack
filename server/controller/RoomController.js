@@ -121,6 +121,7 @@ const amenityIdsSchema = Joi.array().items(Joi.number().integer().required()).mi
 // get RoomsByAmenities
 const getRoomsByAmenities = async (req, res) => {
     const { amenityIds } = req.body;
+    // console.log('Request body:', req.body);
 
     try {
         const { error } = amenityIdsSchema.validate(amenityIds);
@@ -128,6 +129,7 @@ const getRoomsByAmenities = async (req, res) => {
             return res.status(400).json({ msg: 'Invalid request data.', error: error.details[0].message });
         }
 
+    
         const rooms = await prisma.room.findMany({
             where: {
                 AND: amenityIds.map(amenityId => ({

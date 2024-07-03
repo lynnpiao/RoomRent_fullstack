@@ -1,5 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
-const { validateAmenities, validateApartmentAmenities, validateRoomAmenities } = require('../middlewares/SchemaMiddleware')
+const { validateAmenity, validateApartmentAmenities, validateRoomAmenities } = require('../middlewares/SchemaMiddleware')
 const prisma = new PrismaClient();
 const Joi = require('joi');
 
@@ -52,17 +52,17 @@ const getAmenitiesByApartment = async (req, res) => {
 }
 // get AmenitiesByRoom
 const getAmenitiesByRoom = async (req, res) => {
-    const { apartmentId } = req.params;
+    const { roomId } = req.params;
 
     try {
         // Validate apartmentId is a number
-        if (isNaN(parseInt(apartmentId))) {
+        if (isNaN(parseInt(roomId))) {
             return res.status(400).json({ msg: 'Apartment ID must be a valid number.' });
         }
 
         const amenities = await prisma.roomAmenity.findMany({
             where: {
-                apartmentId: parseInt(apartmentId),
+                roomId: parseInt(roomId),
             },
             include: {
                 amenity: true,
@@ -84,23 +84,27 @@ const getAmenitiesByRoom = async (req, res) => {
 }
 
 // create Amenity
-const createAmenities = async (req, res) => {
-    const { amenities } = req.body
+const createAmenity = async (req, res) => {
+    const { name, category } = req.body
 
     try {
-        // Validate amenities array
-        if (!Array.isArray(amenities) || amenities.length === 0) {
-            return res.status(400).json({ msg: 'Amenities must be provided as a non-empty array.' });
+        // Validate amenity array
+        if (typeof name !== 'string' || name.trim() === '' || typeof category !== 'string' || category.trim() === '') {
+            return res.status(400).json({ msg: 'Name and category info must be provided' });
         }
+        
 
-        // Create amenities in the database
-        const createdAmenities = await prisma.amenity.createMany({
-            data: amenities,
+        // Create amenity in the database
+        const createdAmenity = await prisma.amenity.create({
+            data: {
+                name,
+                category
+            },
         });
 
-        res.status(201).json({ msg: 'Amenities created successfully.', amenities: createdAmenities });
+        res.status(201).json({ msg: 'Amenity created successfully.',createdAmenity });
     } catch (error) {
-        res.status(500).json({ msg: 'Failed to create amenities.', error: error.message });
+        res.status(500).json({ msg: 'Failed to create amenity.', error: error.message });
     }
 };
 
@@ -164,35 +168,30 @@ const createAmenitiesByRoom = async (req, res) => {
     }
 }
 
-// Define Joi schema for validation
-const amenityIdsSchema = Joi.array().items(Joi.number().integer().required()).min(1);
 
+// delete Amenity
+const deleteAmenity = async (req, res) => {
 
-// delete Amenities
-const deleteAmenities = async (req, res) => {
-    const {deleteIds} = req.body
+    const id = req.params.id;
+    const idInt = parseInt(id);
 
     try {
-        // Validate request body using Joi
-        const { error } = amenityIdsSchema.validate(deleteIds);
-        if (error) {
-            return res.status(400).json({ msg: 'Invalid request data.', error: error.details[0].message });
+        if (isNaN(idInt)|| idInt<0) {
+            return res.status(400).json({ msg: 'Invalid Amenity Id' });
         }
 
-        const deleteAmenities = await prisma.amenity.deleteMany({
+        const deleteAmenity = await prisma.amenity.delete({
             where: {
-                id: {
-                    in: deleteIds.map(id => parseInt(id)),
-                },
+                id:idInt
             },
         });
 
-        if (!deleteAmenities || deleteAmenities.count === 0) {
-            return res.status(404).json({ error: 'Amenities not found' });
+        if (!deleteAmenity) {
+            return res.status(404).json({ error: 'Amenity not found' });
         }
-        res.status(200).json({ msg: 'Delete Amenities successfully', deleteAmenities });
+        res.status(200).json({ msg: 'Delete Amenity successfully', deleteAmenity });
     } catch (error) {
-        res.status(500).json({ msg: 'Failed to delete amenities', error: error.message });
+        res.status(500).json({ msg: 'Failed to delete amenity', error: error.message });
     }
 }
 
@@ -246,10 +245,10 @@ module.exports = {
     getAmenities,
     getAmenitiesByApartment,
     getAmenitiesByRoom,
-    createAmenities: [validateAmenities, createAmenities],
+    createAmenity: [validateAmenity, createAmenity],
     createAmenitiesByApartment: [validateApartmentAmenities, createAmenitiesByApartment],
     createAmenitiesByRoom: [validateRoomAmenities, createAmenitiesByRoom],
-    deleteAmenities,
+    deleteAmenity,
     deleteAmenityByApartment,
     deleteAmenityByRoom
 }

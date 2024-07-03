@@ -64,6 +64,8 @@ model Amenity{
   category String
   rooms RoomAmenity[]
   apartments ApartmentAmenity[]
+
+  @@unique([name, category])
 }
 
 model ManageApartment{

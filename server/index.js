@@ -13,7 +13,10 @@ const app = express();
 const port = 8000;
 
 // express config
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', // Replace with your client origin
+  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+}));
 app.use(express.urlencoded({extended: true}));
 app.use(cookieParser());
 app.use(express.json());

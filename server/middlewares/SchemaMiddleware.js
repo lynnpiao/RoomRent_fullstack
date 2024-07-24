@@ -1,7 +1,5 @@
 const Joi = require("joi");
 
-
-
 //Validation For create User
 // Joi validation schema 
 const userSchema = Joi.object({

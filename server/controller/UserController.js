@@ -55,9 +55,9 @@ const loginAccount = async (req, res) => {
         );
 
         res.cookie('accessToken', accessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-            sameSite: 'strict',
+            httpOnly: false,  // Set to false to allow client-side access
+            secure: false,    // Set to true if using HTTPS
+            sameSite: 'Lax',  // Adjust as needed
             maxAge: 7200000 // 2 hours
         });
 
@@ -67,7 +67,8 @@ const loginAccount = async (req, res) => {
                 email: user.email,
                 id: user.id,
                 role: user.role
-            }
+            },
+            token: accessToken
         });
     } catch (error) {
         console.error(error);

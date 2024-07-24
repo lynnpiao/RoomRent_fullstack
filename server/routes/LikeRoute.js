@@ -7,6 +7,6 @@ const { validateToken, validateRole } = require('../middlewares/AuthMiddleware')
 const router = express.Router()
 
 // tested
-router.post('/api/likes', validateToken, validateRole('tenant'), toggleLike)
+router.post('/likes', validateToken, validateRole('tenant'), toggleLike)
 
 module.exports = router;

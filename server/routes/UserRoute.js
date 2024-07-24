@@ -7,8 +7,8 @@ const {createAccount, loginAccount, auth} = UserController;
 const router = express.Router()
 
 // all tested
-router.post('/api/user', createAccount)
-router.post('/api/user/login', loginAccount)
-router.get('/api/user/auth', validateToken, auth)
+router.post('/user', createAccount)
+router.post('/user/login', loginAccount)
+router.get('/user/auth', validateToken, auth)
 
 module.exports = router;

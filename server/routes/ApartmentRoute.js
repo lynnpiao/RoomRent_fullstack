@@ -15,13 +15,13 @@ const router = express.Router()
 
 
 // all tested
-router.get('/api/apartments', getApartments)
-router.get('/api/apartments/:roomId', getApartmentByRoom) 
-router.get('/api/apartments/manage/:userId', getApartmentsByManager)
-router.post('/api/apartments', validateToken, validateRole('manager'), createApartment)
-router.post('/api/manageapartments', validateToken, validateRole('manager'), createManageApartment)
-router.put('/api/apartments/:id', validateToken, validateRole('manager'), updateApartment)
-router.delete('/api/apartments/:id', validateToken, validateRole('manager'), deleteApartment)
-router.delete('/api/manageapartments', validateToken, validateRole('manager'), deleteManageApartment)
+router.get('/apartments', getApartments)
+router.get('/apartments/:roomId', getApartmentByRoom) 
+router.get('/apartments/manage/:userId', getApartmentsByManager)
+router.post('/apartments', validateToken, validateRole('manager'), createApartment)
+router.post('/manageapartments', validateToken, validateRole('manager'), createManageApartment)
+router.put('/apartments/:id', validateToken, validateRole('manager'), updateApartment)
+router.delete('/apartments/:id', validateToken, validateRole('manager'), deleteApartment)
+router.delete('/manageapartments', validateToken, validateRole('manager'), deleteManageApartment)
 
 module.exports = router;

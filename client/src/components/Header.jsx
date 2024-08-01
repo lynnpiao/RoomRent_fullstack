@@ -48,7 +48,7 @@ const Header = () => {
         <>
             <header className='flex bg-white border-b py-4 sm:px-8 px-6 font-[sans-serif] min-h-[80px] tracking-wide relative z-50'>
                 <div className='flex flex-wrap items-center lg:gap-y-2 gap-4 w-full'>
-                    <p className="text-2xl font-bold italic"> Room Rent</p>
+                    <h1 className="text-3xl font-sans font-bold"> Room Rent</h1>
 
                     <div id="collapseMenu"
                         style={{ display: isMenuOpen ? 'block' : 'none' }}
@@ -59,11 +59,11 @@ const Header = () => {
 
                         <ul
                             className='lg:flex lg:gap-x-3 max-lg:space-y-3 max-lg:fixed max-lg:bg-white max-lg:w-1/2 max-lg:min-w-[300px] max-lg:top-0 max-lg:left-0 max-lg:p-6 max-lg:h-full max-lg:shadow-md max-lg:overflow-auto z-50'>
-                            <li className='max-lg:border-b max-lg:py-3 px-3'>
+                            <li className='max-lg:border-b max-lg:py-3 px-3 font-sans'>
                                 <NavLink to='/' className={linkState}>
                                     Home
                                 </NavLink></li>
-                            <li className='max-lg:border-b max-lg:py-3 px-3'>
+                            <li className='max-lg:border-b max-lg:py-3 px-3 font-sans'>
                                 {authState.status && (
                                     <>
                                         {authState.role === 'tenant' && (
@@ -94,14 +94,14 @@ const Header = () => {
                             {!authState.status ?
                                 (<>
                                     <button onClick={navigateToLogin}
-                                        className='text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700'>Login
+                                        className='text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-sans font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700'>Login
                                     </button>
                                     <button onClick={navigateToSign}
-                                        className='text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700'>Sign up</button>
+                                        className='text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-sans font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700'>Sign up</button>
                                 </>) : (
                                     <>
                                         <button onClick={SingOutAndNagivateToHome}
-                                            className='text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700'>Logout</button>
+                                            className='text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-sans font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700'>Logout</button>
                                     </>
                                 )
 

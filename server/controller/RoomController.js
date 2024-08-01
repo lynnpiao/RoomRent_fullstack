@@ -4,27 +4,41 @@ const prisma = new PrismaClient();
 const Joi = require('joi');
 
 
-// get AllRooms
+// get lastest Rooms
 const getRooms = async (req, res) => {
     try {
         const rooms = await prisma.room.findMany({
             include: {
                 apartment: {
-                    select: {
-                        name: true,
-                        contact_email: true
+                    include: {
+                        managers: {
+                            include: {
+                                user: {
+                                    select: {
+                                        email: true
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
-            }
+            },
+            orderBy: {
+                createdAt: 'desc' // Sort by createdAt in descending order
+            },
+            take: 5 // Limit to the latest 5 rooms
         })
 
         if (!rooms || rooms.length === 0) {
             return res.status(404).json({ msg: 'No rooms found' });
         }
+        // Map the results to include apartment details and managerEmails
         const roomsWithApartment = rooms.map(room => ({
             ...room,
-            name: room.apartment ? room.apartment.name : null,
+            apartmentName: room.apartment ? room.apartment.name : null,
             contact_email: room.apartment ? room.apartment.contact_email : null,
+            address: room.apartment ? room.apartment.address : null,
+            managerEmails: room.apartment ? room.apartment.managers.map(manager => manager.user.email) : []
         }));
 
         res.status(200).json(roomsWithApartment)
@@ -49,24 +63,32 @@ const getRoomById = async (req, res) => {
             },
             include: {
                 apartment: {
-                    select: {
-                        name: true,
-                        contact_email: true
-                    }
-                }
-            }
-        })
+                    include: {
+                        managers: {
+                            include: {
+                                user: {
+                                    select: {
+                                        email: true
+                                    }
+                                }
+                            }
+                        }
+                    }}}
+        });
 
         if (!room) {
-            return res.status(404).json({ msg: 'No rooms found' });
+            return res.status(404).json({ msg: 'Room not found' });
         }
+
         const roomWithApartment = {
             ...room,
-            name: room.apartment ? room.apartment.name : null,
+            apartmentName: room.apartment ? room.apartment.name : null,
             contact_email: room.apartment ? room.apartment.contact_email : null,
+            address: room.apartment ? room.apartment.address : null,
+            managerEmails: room.apartment ? room.apartment.managers.map(manager => manager.user.email) : []
         };
 
-        res.status(200).json(roomWithApartment)
+        res.status(200).json(roomWithApartment);
     } catch (error) {
         res.status(500).json({ msg: error.message })
     }
@@ -89,24 +111,35 @@ const getRoomsByApartment = async (req, res) => {
             },
             include: {
                 apartment: {
-                    select: {
-                        name: true,
-                        contact_email: true
+                    include: {
+                        managers: {
+                            include: {
+                                user: {
+                                    select: {
+                                        email: true
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
-        })
+        });
 
         if (!rooms || rooms.length === 0) {
             return res.status(404).json({ msg: 'No rooms found' });
         }
+
         const roomsWithApartment = rooms.map(room => ({
             ...room,
-            name: room.apartment ? room.apartment.name : null,
+            apartmentName: room.apartment ? room.apartment.name : null,
             contact_email: room.apartment ? room.apartment.contact_email : null,
+            address: room.apartment ? room.apartment.address : null,
+            managerEmails: room.apartment ? room.apartment.managers.map(manager => manager.user.email) : []
         }));
 
-        res.status(200).json(roomsWithApartment)
+        res.status(200).json(roomsWithApartment);
+
     } catch (error) {
         res.status(500).json({ msg: error.message })
     }
@@ -128,8 +161,8 @@ const getRoomsByAmenities = async (req, res) => {
         if (error) {
             return res.status(400).json({ msg: 'Invalid request data.', error: error.details[0].message });
         }
-
-    
+        
+        // Fetch rooms based on amenity IDs
         const rooms = await prisma.room.findMany({
             where: {
                 AND: amenityIds.map(amenityId => ({
@@ -142,24 +175,36 @@ const getRoomsByAmenities = async (req, res) => {
             },
             include: {
                 apartment: {
-                    select: {
-                        name: true,
-                        contact_email: true
-                    }
-                }
-            }
+                    include: {
+                        managers: {
+                            include: {
+                                user: {
+                                    select: {
+                                        email: true
+                                    }
+                                }
+                            }
+                        }
+                    },
+
+            }}
         });
 
         if (!rooms || rooms.length === 0) {
             return res.status(404).json({ msg: 'No rooms found' });
         }
+
+        // Map the results to include apartment details and manager emails
         const roomsWithApartment = rooms.map(room => ({
             ...room,
-            name: room.apartment ? room.apartment.name : null,
+            apartmentName: room.apartment ? room.apartment.name : null,
             contact_email: room.apartment ? room.apartment.contact_email : null,
+            address: room.apartment ? room.apartment.address : null,
+            managerEmails: room.apartment ? room.apartment.managers.map(manager => manager.user.email) : []
         }));
 
-        res.status(200).json(roomsWithApartment)
+        res.status(200).json(roomsWithApartment);
+
     } catch (error) {
         res.status(500).json({ msg: error.message });
     }
@@ -194,9 +239,16 @@ const getRoomsByAttributes = async (req, res) => {
             where: query,
             include: {
                 apartment: {
-                    select: {
-                        name: true,
-                        contact_email: true
+                    include: {
+                        managers: {
+                            include: {
+                                user: {
+                                    select: {
+                                        email: true
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -205,13 +257,18 @@ const getRoomsByAttributes = async (req, res) => {
         if (!rooms || rooms.length === 0) {
             return res.status(404).json({ msg: 'No rooms found' });
         }
+
+        // Map the results to include apartment details and manager emails
         const roomsWithApartment = rooms.map(room => ({
             ...room,
-            name: room.apartment ? room.apartment.name : null,
+            apartmentName: room.apartment ? room.apartment.name : null,
             contact_email: room.apartment ? room.apartment.contact_email : null,
+            address: room.apartment ? room.apartment.address : null,
+            managerEmails: room.apartment ? room.apartment.managers.map(manager => manager.user.email) : []
         }));
 
-        res.status(200).json(roomsWithApartment)
+        res.status(200).json(roomsWithApartment);
+
 
     } catch (error) {
         res.status(500).json({ msg: error.message });

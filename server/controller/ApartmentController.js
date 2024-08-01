@@ -4,18 +4,43 @@ const { validateApartment, validatePartialApartment } = require('../middlewares/
 const prisma = new PrismaClient()
 
 
-// get all apartments
+// get lastest  apartments
 
 const getApartments = async (req, res) => {
     try {
-    
-        const apartments = await prisma.apartment.findMany();
+        const apartments = await prisma.apartment.findMany({
+            include: {
+                managers: {
+                    include: {
+                        user: {
+                            select: {
+                                email: true
+                            }
+                        }
+                    }
+                }
+            },
+
+            orderBy: {
+                id: 'desc' // Sort by id in descending order
+            },
+            take: 5 // Limit to the last 5 largest apartments
+        });
+
         if (!apartments || apartments.length === 0) {
             return res.status(404).json({ msg: 'No apartments found' });
         }
-        res.status(200).json(apartments)
+
+        // Map the results to include managerEmails
+        const apartmentsWithManagerEmails = apartments.map(apartment => ({
+            ...apartment,
+            managerEmails: apartment.managers.map(manager => manager.user.email)
+        }));
+
+        res.status(200).json(apartmentsWithManagerEmails);
+
     } catch (error) {
-        res.status(500).json({ msg: error.message })
+        res.status(500).json({ msg: error.message });
     }
 
 }
@@ -35,13 +60,33 @@ const getApartmentByRoom = async (req, res) => {
                     id: parseInt(roomId),
                 },
                 include: {
-                    apartment: true,
+                    apartment: {
+                        include: {
+                            managers: {
+                                include: {
+                                    user: {
+                                        select: {
+                                            email: true
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             })
-        if (!room) {
+
+        if (!room || !room.apartment) {
             return res.status(404).json({ msg: `Apartment with roomID ${roomId} not found.` });
         }
-        res.status(200).json(room.apartment)
+
+        const apartmentWithManagerEmails = {
+            ...room.apartment,
+            managerEmails: room.apartment.managers.map(manager => manager.user.email)
+        };
+
+        res.status(200).json(apartmentWithManagerEmails);
+
     } catch (error) {
         res.status(500).json({ msg: error.message })
     }
@@ -57,24 +102,42 @@ const getApartmentsByManager = async (req, res) => {
             return res.status(400).json({ msg: 'Manager ID must be a valid number.' });
         }
 
-        const managerWithApartments = await prisma.user.findUnique(
-            {
-                where: {
-                    id: parseInt(userId),
+        const managerWithApartments = await prisma.user.findUnique({
+            where: {
+                id: parseInt(userId),
+            },
+            include: {
+                apartments: {
+                    include: {
+                        apartment: {
+                            include: {
+                                managers: {
+                                    include: {
+                                        user: {
+                                            select: {
+                                                email: true
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 },
-                include: {
-                    apartments: {
-                        include: {
-                            apartment: true, // This includes the related apartment details
-                        },
-                    },
-                },
-            })
+            }
+        });
+
         if (!managerWithApartments) {
-            return res.status(404).json({ msg: `Apartment with userId ${userId} not found.` });
+            return res.status(404).json({ msg: `Manager with userId ${userId} not found.` });
         }
-        const apartments = managerWithApartments.apartments.map(item => item.apartment);
-        res.status(200).json(apartments)
+
+        const apartments = managerWithApartments.apartments.map(item => ({
+            ...item.apartment,
+            managerEmails: item.apartment.managers.map(manager => manager.user.email)
+        }));
+
+        res.status(200).json(apartments);
+
     } catch (error) {
         res.status(500).json({ msg: error.message })
     }

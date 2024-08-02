@@ -9,6 +9,7 @@ import { useCookies } from "react-cookie";
 import { useState, useEffect } from 'react';
 import MainLayout from './layouts/MainLayout';
 import HomePage from './pages/HomePage';
+import ApartmentDetail, { apartmentLoader }  from './pages/ApartmentDetail';
 import Register from './pages/Reigster';
 import Login from './pages/Login';
 import axios from 'axios';
@@ -16,6 +17,8 @@ import axios from 'axios';
 
 
 const App = () => {
+
+  const base_url = import.meta.env.VITE_API_URL;
 
   const [cookies,] = useCookies(['accessToken']);
 
@@ -33,7 +36,7 @@ const App = () => {
 
     if (accessToken) {
       axios
-        .get("http://localhost:8000/user/auth", {
+        .get(`${base_url}/user/auth`, {
           withCredentials: true
         })
         .then((response) => {
@@ -58,6 +61,11 @@ const App = () => {
     createRoutesFromElements(
       <Route path='/' element={<MainLayout />}>
         <Route index element={<HomePage />} />
+        <Route
+          path='/apartmentdetails/:id'
+          element={<ApartmentDetail />}
+          loader={apartmentLoader}
+        />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         {/* <Route path='*' element={<PageNotFound />} /> */}

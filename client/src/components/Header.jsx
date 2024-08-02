@@ -26,7 +26,7 @@ const Header = () => {
     const navigateToSign = () => {
         navigate('/register');
     }
-    console.log(document.cookie);
+    // console.log(document.cookie);
 
     const SingOutAndNagivateToHome = () => {
         if (window.confirm("Are you sure you want to logout?")) {

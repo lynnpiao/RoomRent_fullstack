@@ -46,6 +46,50 @@ const getApartments = async (req, res) => {
 }
 
 
+// get ApartmentById
+const getApartmentById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        if (isNaN(parseInt(id))) {
+            return res.status(400).json({ msg: 'Apartment ID must be a valid number.' });
+        }
+
+        const apartment = await prisma.apartment.findUnique({
+            where: {
+                id: parseInt(id),
+            },
+            include: {
+                managers: {
+                    include: {
+                        user: {
+                            select: {
+                                email: true
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        if (!apartment) {
+            return res.status(404).json({ msg: 'No apartment found' });
+        }
+
+        // Add managerEmails to the apartment object
+        const apartmentWithManagerEmails = {
+            ...apartment,
+            managerEmails: apartment.managers.map(manager => manager.user.email)
+        };
+
+        res.status(200).json(apartmentWithManagerEmails);
+
+    } catch (error) {
+        res.status(500).json({ msg: error.message });
+    }
+};
+
+
+
 // get ApartmentByRoom
 const getApartmentByRoom = async (req, res) => {
     const { roomId } = req.params;
@@ -273,6 +317,7 @@ const deleteManageApartment = async (req, res) => {
 
 module.exports = {
     getApartments,
+    getApartmentById,
     getApartmentByRoom,
     getApartmentsByManager,
     createApartment: [validateApartment, createApartment],

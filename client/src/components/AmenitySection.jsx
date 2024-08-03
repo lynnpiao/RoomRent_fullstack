@@ -117,6 +117,35 @@ const AmenitySection = ({ amenities, type, isManageable }) => {
       };
 
     const deleteRoomAmenity = async (amenityId) => {
+
+        if (!isManageable) {
+            console.log("User is not authenticated. Delete Amenity blocked.");
+            return;
+        }
+        // Display confirmation dialog
+        const confirmDelete = window.confirm('Are you sure you want to delete this amenity?');
+        if (!confirmDelete) {
+            return; // If user cancels, exit the function
+          }
+        // delete
+        try {
+            const response = await axios.delete(`${base_url}/amenities/room/${id}/${amenityId}`, 
+              {
+                withCredentials: true, // Make sure cookies are sent with the request
+              });
+
+            // After deletion, update the state by filtering out the deleted amenity
+            const updatedAmenities = localAmenities.filter(amenity => amenity.id !== amenityId);
+            setLocalAmenities(updatedAmenities);
+            
+            toast.success('Deleted amenity successfully');
+
+        } catch (error) {
+            console.error('Error deleting amenity:', error);
+            // toast.error('Failed to delete amenity');
+        }
+        
+
     
     };
 
@@ -125,7 +154,7 @@ const AmenitySection = ({ amenities, type, isManageable }) => {
     return (
         <div className="bg-gray-50 px-4 py-12 font-[sans-serif]">
             <div className="max-w-6xl mx-auto">
-                <h2 className="text-gray-800 sm:text-4xl text-2xl font-extrabold text-center mb-16">{type === 'community' ? 'Community Amenity' : 'Apartment Amenity'}</h2>
+                <h2 className="text-gray-800 sm:text-4xl text-2xl font-extrabold text-center mb-16">{type === 'community' ? 'Community Amenity' : 'Room Amenity'}</h2>
                 <div className="grid lg:grid-cols-3 md:grid-cols-2 max-md:max-w-lg mx-auto gap-8">
                     {localAmenities.map(amenity => (
                         <div key={amenity.id} className="p-6 flex gap-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-all">

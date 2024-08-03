@@ -55,9 +55,9 @@ const getAmenitiesByRoom = async (req, res) => {
     const { roomId } = req.params;
 
     try {
-        // Validate apartmentId is a number
+        // Validate roomId is a number
         if (isNaN(parseInt(roomId))) {
-            return res.status(400).json({ msg: 'Apartment ID must be a valid number.' });
+            return res.status(400).json({ msg: 'Room ID must be a valid number.' });
         }
 
         const amenities = await prisma.roomAmenity.findMany({
@@ -70,7 +70,7 @@ const getAmenitiesByRoom = async (req, res) => {
         });
 
         if (!amenities || amenities.length === 0) {
-            return res.status(404).json({ msg: `No amenities found for Apartment ID ${apartmentId}.` });
+            return res.status(404).json({ msg: `No amenities found for Room ID ${roomId}.` });
         }
 
         // Extract only the amenity details
@@ -78,10 +78,11 @@ const getAmenitiesByRoom = async (req, res) => {
 
         res.status(200).json(amenityDetails);
     } catch (error) {
+        console.error(error); // Log the error for debugging purposes
         res.status(500).json({ msg: 'Internal server error.' });
     }
+};
 
-}
 
 // create Amenity
 const createAmenity = async (req, res) => {

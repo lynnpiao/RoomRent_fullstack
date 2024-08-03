@@ -10,6 +10,7 @@ import { useState, useEffect } from 'react';
 import MainLayout from './layouts/MainLayout';
 import HomePage from './pages/HomePage';
 import ApartmentDetail, { apartmentLoader }  from './pages/ApartmentDetail';
+import RoomDetail, {roomLoader} from './pages/RoomDetail';
 import Register from './pages/Reigster';
 import Login from './pages/Login';
 import axios from 'axios';
@@ -65,6 +66,11 @@ const App = () => {
           path='/apartmentdetails/:id'
           element={<ApartmentDetail />}
           loader={apartmentLoader}
+        />
+        <Route
+          path='/roomdetails/:id'
+          element={<RoomDetail />}
+          loader={roomLoader}
         />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />

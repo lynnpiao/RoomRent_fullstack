@@ -28,7 +28,8 @@ const Header = () => {
     }
     // console.log(document.cookie);
 
-    const SingOutAndNagivateToHome = () => {
+    const SignOutAndNagivateToHome = () => {
+
         if (window.confirm("Are you sure you want to logout?")) {
             localStorage.removeItem("email");
             localStorage.removeItem("id");
@@ -100,7 +101,7 @@ const Header = () => {
                                         className='text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-sans font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700'>Sign up</button>
                                 </>) : (
                                     <>
-                                        <button onClick={SingOutAndNagivateToHome}
+                                        <button onClick={SignOutAndNagivateToHome}
                                             className='text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-sans font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700'>Logout</button>
                                     </>
                                 )

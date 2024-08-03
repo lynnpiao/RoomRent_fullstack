@@ -19,8 +19,16 @@ const ApartmentDetail = () => {
   return (
     <>
     <ApartmentContentSection apartment={apartmentInfo.apartment} isManageable={isManageable}/>
-    <ApartmentRoomList rooms={apartmentInfo.rooms} isManageable={isManageable}/>
-    <AmenitySection amenities={apartmentInfo.amenities} type={'community'} isManageable={isManageable}/></>
+    {apartmentInfo.rooms ? (
+                <ApartmentRoomList rooms={apartmentInfo.rooms} isManageable={isManageable} />
+            ) : (
+                <></>
+            )}
+    {apartmentInfo.amenities ? (<AmenitySection amenities={apartmentInfo.amenities} type={'community'} isManageable={isManageable}/>)
+    : (
+        <></>
+    )}
+    </>
   )
 }
 
@@ -32,14 +40,24 @@ const apartmentLoader = async ({ params }) => {
     try {
         const [apartmentResponse, amenitiesResponse, roomsResponse] = await Promise.all([
             axios.get(`${base_url}/apartments/${params.id}`),
-            axios.get(`${base_url}/amenities/apartment/${params.id}`),
-            axios.get(`${base_url}/rooms/apartment/${params.id}`)
+            axios.get(`${base_url}/amenities/apartment/${params.id}`).catch(error => {
+                if (error.response && error.response.status === 404) {
+                    return { status: 404, data: null }; // Return a 404 status with null data
+                }
+                throw error; // Rethrow other errors
+            }),
+            axios.get(`${base_url}/rooms/apartment/${params.id}`).catch(error => {
+                if (error.response && error.response.status === 404) {
+                    return { status: 404, data: null }; // Return a 404 status with null data
+                }
+                throw error; // Rethrow other errors
+            }),
           ]);
           
           return {
             apartment: apartmentResponse.data,
-            amenities: amenitiesResponse.data,
-            rooms: roomsResponse.data,
+            amenities: amenitiesResponse.status === 404 ? null : amenitiesResponse.data,
+            rooms: roomsResponse.status === 404 ? null : roomsResponse.data,
           };
 
     } catch (error) {

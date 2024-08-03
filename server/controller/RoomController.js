@@ -335,11 +335,11 @@ const deleteRoom = async (req, res) => {
     const idInt = parseInt(id);
 
     try {
-
-        if (isNaN(idInt) || idInt <= 0 ) {
+        if (isNaN(idInt) || idInt <= 0) {
             return res.status(400).json({ error: 'Invalid RoomId' });
         }
 
+        // Attempt to delete the room
         const deletedRoom = await prisma.room.delete({
             where: {
                 id: idInt,
@@ -349,11 +349,13 @@ const deleteRoom = async (req, res) => {
         if (!deletedRoom) {
             return res.status(404).json({ error: 'Room not found' });
         }
-        res.status(200).json({ msg: 'Delete Room successfully', deletedRoom}); 
+
+        res.status(200).json({ msg: 'Delete Room successfully', deletedRoom });
     } catch (error) {
-        res.status(500).json({ msg: error.message })
+        console.error('Error deleting room:', error); // Log the error for debugging
+        res.status(500).json({ msg: 'Internal Server Error', error: error.message });
     }
-}
+};
 
 module.exports = {
     getRooms,

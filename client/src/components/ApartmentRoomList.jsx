@@ -64,7 +64,7 @@ const ApartmentRoomList = ({ rooms, isManageable }) => {
                                 <h4 className="text-lg text-gray-800 font-bold mt-2">${room.rentPerMonth}</h4>
                                 <p className="text-gray-600 text-sm mt-2">{room.sqFeet} sqft / Unit No.{room.aptNumber}</p>
                             </div>
-                            {isManageable && (
+                            
                                 <button
                                     type="button"
                                     className="ml-4"
@@ -72,7 +72,7 @@ const ApartmentRoomList = ({ rooms, isManageable }) => {
                                 >
                                     <MdOutlineNavigateNext size={24} />
                                 </button>
-                            )}
+                        
                         </div>
                     </div>
                 ))}

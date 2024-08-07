@@ -8,6 +8,7 @@ import dayjs from 'dayjs';
 import { useState, useContext } from 'react';
 import { AuthContext } from '../utils/AuthContext';
 import ContactModal from './ContactModal';
+import PropTypes from 'prop-types';
 
 const formatAvailabilityDate = (availableDate) => {
     const now = dayjs();
@@ -18,7 +19,7 @@ const formatAvailabilityDate = (availableDate) => {
     return 'Now';
 };
 
-const RoomContentSection = ({ room, isManageable }) => {
+const RoomContentSection = ({ room }) => {
 
     const availabilityDate = formatAvailabilityDate(room.availableDate);
     const bed_type = room.type.split('/')[0];
@@ -161,5 +162,10 @@ const RoomContentSection = ({ room, isManageable }) => {
         </div>
     )
 }
+
+RoomContentSection.propTypes = {
+    room: PropTypes.object.isRequired
+};
+
 
 export default RoomContentSection

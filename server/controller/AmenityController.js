@@ -6,8 +6,13 @@ const Joi = require('joi');
 
 // get AllAmenities
 const getAmenities = async (req, res) => {
+    const {category} = req.body
+    console.log("Category received:", category);
+
     try {
-        const amenities = await prisma.amenity.findMany()
+        const amenities = await prisma.amenity.findMany({
+            where: { category }
+        })
 
         if (amenities.length === 0) {
             return res.status(404).json({ msg: 'No amenities found' });
@@ -144,6 +149,10 @@ const createAmenitiesByApartment = async (req, res) => {
 const createAmenitiesByRoom = async (req, res) => {
     const { roomId } = req.params
     const roomAmenities = req.body
+
+    console.log('Room Id received', roomId);
+    console.log('Room Amenity Ids received', roomAmenities);
+
     try {
         if (isNaN(parseInt(roomId))) {
             return res.status(400).json({ msg: 'Room ID must be a valid number.' });
@@ -154,9 +163,9 @@ const createAmenitiesByRoom = async (req, res) => {
         }
 
         // Create an array of objects to pass to createMany
-        const data = roomAmenities.map(amenityId => ({
+        const data = roomAmenities.map(id => ({
             roomId: parseInt(roomId),
-            amenityId: parseInt(amenityId),
+            amenityId: parseInt(id),
         }));
 
         const createdRoomAmenities = await prisma.roomAmenity.createMany({

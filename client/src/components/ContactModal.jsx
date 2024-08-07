@@ -1,6 +1,7 @@
 import React from 'react'
 import Modal from 'react-modal';
 import { useState } from 'react';
+import PropTypes from "prop-types";
 
 const ContactModal = ({ isOpen, onRequestClose, managerEmail }) => {
     const [formData, setFormData] = useState({
@@ -121,5 +122,13 @@ const ContactModal = ({ isOpen, onRequestClose, managerEmail }) => {
         </Modal>
     );
 }
+
+
+ContactModal.propTypes = {
+    isOpen: PropTypes.bool.isRequired,
+    onRequestClose: PropTypes.func.isRequired,
+    managerEmail: PropTypes.string.isRequired,
+};
+
 
 export default ContactModal

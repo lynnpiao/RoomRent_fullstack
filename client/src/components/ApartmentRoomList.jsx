@@ -2,8 +2,9 @@ import { useState } from "react";
 import React from 'react'
 import { MdOutlineNavigateNext } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 
-const ApartmentRoomList = ({ rooms, isManageable }) => {
+const ApartmentRoomList = ({ rooms }) => {
 
     const [selectedType, setSelectedType] = useState('All');
     const navigate = useNavigate();
@@ -82,5 +83,11 @@ const ApartmentRoomList = ({ rooms, isManageable }) => {
         </>
     )
 }
+
+
+ApartmentRoomList.propTypes = {
+    rooms: PropTypes.object.isRequired
+};
+
 
 export default ApartmentRoomList

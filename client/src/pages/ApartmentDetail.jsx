@@ -14,13 +14,13 @@ const ApartmentDetail = () => {
 
 
 //   console.log(apartmentInfo.apartment);
-  console.log(apartmentInfo.rooms);
+//   console.log(apartmentInfo.rooms);
     
   return (
     <>
     <ApartmentContentSection apartment={apartmentInfo.apartment} isManageable={isManageable}/>
     {apartmentInfo.rooms ? (
-                <ApartmentRoomList rooms={apartmentInfo.rooms} isManageable={isManageable} />
+                <ApartmentRoomList rooms={apartmentInfo.rooms} />
             ) : (
                 <></>
             )}

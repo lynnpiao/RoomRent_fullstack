@@ -37,19 +37,19 @@ const RoomDetail = () => {
                 withCredentials: true, // Make sure cookies are sent with the request
               });
             
-            toast.success('Deleted amenity successfully');
+            toast.success('Deleted Room successfully');
             navigate('/');
 
         } catch (error) {
-            console.error('Error deleting amenity:', error);
-            // toast.error('Failed to delete amenity');
+            console.error('Error deleting Room:', error);
+            // toast.error('Failed to delete Room');
         }
     
     };
 
     return (
         <>
-            <RoomContentSection room={roomInfo.room} isManageable={isManageable} />
+            <RoomContentSection room={roomInfo.room}/>
             <br></br>
             {roomInfo.amenities ? (<AmenitySection amenities={roomInfo.amenities} type={'apartment'} isManageable={isManageable} />)
                 : (

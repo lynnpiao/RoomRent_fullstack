@@ -15,7 +15,7 @@ const { validateToken, validateRole } = require('../middlewares/AuthMiddleware')
 const router = express.Router()
 
 // all tested 
-router.get('/amenities', getAmenities)
+router.post('/amenities/bycategory', getAmenities)
 router.get('/amenities/apartment/:apartmentId', getAmenitiesByApartment)
 router.get('/amenities/room/:roomId', getAmenitiesByRoom)
 router.post('/amenities', createAmenity)

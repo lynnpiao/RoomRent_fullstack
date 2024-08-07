@@ -15,6 +15,7 @@ import { CgUnavailable } from "react-icons/cg";
 import { RiDeleteBin6Fill } from "react-icons/ri";
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import PropTypes from "prop-types";
 
 
 const AmenitySection = ({ amenities, type, isManageable }) => {
@@ -137,7 +138,7 @@ const AmenitySection = ({ amenities, type, isManageable }) => {
             // After deletion, update the state by filtering out the deleted amenity
             const updatedAmenities = localAmenities.filter(amenity => amenity.id !== amenityId);
             setLocalAmenities(updatedAmenities);
-            
+
             toast.success('Deleted amenity successfully');
 
         } catch (error) {
@@ -187,5 +188,12 @@ const AmenitySection = ({ amenities, type, isManageable }) => {
         </div>
     )
 }
+
+AmenitySection.propTypes = {
+    amenities: PropTypes.object.isRequired,
+    type: PropTypes.string.isRequired,
+    isManageable: PropTypes.bool.isRequired
+};
+
 
 export default AmenitySection

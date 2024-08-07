@@ -11,6 +11,7 @@ import MainLayout from './layouts/MainLayout';
 import HomePage from './pages/HomePage';
 import ApartmentDetail, { apartmentLoader }  from './pages/ApartmentDetail';
 import RoomDetail, {roomLoader} from './pages/RoomDetail';
+import AddRoom from './pages/AddRoom';
 import Register from './pages/Reigster';
 import Login from './pages/Login';
 import axios from 'axios';
@@ -71,6 +72,10 @@ const App = () => {
           path='/roomdetails/:id'
           element={<RoomDetail />}
           loader={roomLoader}
+        />
+        <Route
+          path='/addroom/:id'
+          element={<AddRoom />}
         />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />

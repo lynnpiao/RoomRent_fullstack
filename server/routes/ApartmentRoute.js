@@ -2,6 +2,7 @@ const express = require('express');
 const ApartmentController = require('../controller/ApartmentController');
 const {
     getApartments,
+    getAllApartments,
     getApartmentById,
     getApartmentByRoom,
     getApartmentsByManager,
@@ -11,7 +12,7 @@ const {
     createManageApartment,
     deleteManageApartment,
     deleteAllManagersByApartment } = ApartmentController;
-    
+
 const { validateToken, validateRole } = require('../middlewares/AuthMiddleware')
 
 const router = express.Router()
@@ -19,6 +20,7 @@ const router = express.Router()
 
 // all tested
 router.get('/apartments', getApartments)
+router.get('/apartments/all', getAllApartments)
 router.get('/apartments/:id', getApartmentById) 
 router.get('/apartments/room/:roomId', getApartmentByRoom) 
 router.get('/apartments/manage/:userId', getApartmentsByManager)

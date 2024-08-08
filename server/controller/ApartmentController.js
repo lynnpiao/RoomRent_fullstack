@@ -46,6 +46,41 @@ const getApartments = async (req, res) => {
 }
 
 
+const getAllApartments = async (req, res) => {
+    try {
+        const apartments = await prisma.apartment.findMany({
+            include: {
+                managers: {
+                    include: {
+                        user: {
+                            select: {
+                                email: true
+                            }
+                        }
+                    }
+                }
+            },
+        });
+
+        if (!apartments || apartments.length === 0) {
+            return res.status(404).json({ msg: 'No apartments found' });
+        }
+
+        // Map the results to include managerEmails
+        const apartmentsWithManagerEmails = apartments.map(apartment => ({
+            ...apartment,
+            managerEmails: apartment.managers.map(manager => manager.user.email)
+        }));
+
+        res.status(200).json(apartmentsWithManagerEmails);
+
+    } catch (error) {
+        res.status(500).json({ msg: error.message });
+    }
+
+}
+
+
 // get ApartmentById
 const getApartmentById = async (req, res) => {
     const { id } = req.params;
@@ -344,6 +379,7 @@ const deleteAllManagersByApartment = async (req, res) => {
 
 module.exports = {
     getApartments,
+    getAllApartments,
     getApartmentById,
     getApartmentByRoom,
     getApartmentsByManager,

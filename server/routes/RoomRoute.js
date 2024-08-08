@@ -1,6 +1,7 @@
 const express = require('express');
 const RoomController = require('../controller/RoomController');
 const {getRooms,
+    getAllRooms,
     getRoomById,
     getRoomsByApartment,
     getRoomsByAmenities,
@@ -15,6 +16,7 @@ const router = express.Router()
 
 //all tested
 router.get('/rooms', getRooms)
+router.get('/rooms/all', getAllRooms)
 router.get('/rooms/:id', getRoomById)
 router.get('/rooms/apartment/:apartmentId', getRoomsByApartment)
 router.post('/rooms/amenities', getRoomsByAmenities)

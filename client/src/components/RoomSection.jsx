@@ -13,6 +13,7 @@ const RoomSection = ({ isHome = false }) => {
     const [rooms, setRooms] = useState([]);
     const { authState } = useContext(AuthContext);
     const [user, setUser] = useState({});
+    const [viewAll, setViewAll] = useState(false);
     let { roomId } = useParams();
 
     useEffect(() => {
@@ -44,9 +45,40 @@ const RoomSection = ({ isHome = false }) => {
         }
     };
 
+    const fetchAllRoomList = async () => {
+
+        const url = `${base_url}/rooms/all`;
+
+        try {
+            // console.log(url);
+            const response = await axios.get(url);
+            const data = await response.data;
+
+            setRooms(data);// Ensure this matches the shape of your data
+        } catch (error) {
+
+            if (error.response && error.response.status === 404) {
+                console.log('No rooms found.');
+                setRooms([]);
+                return null; // or return an appropriate error message or status
+            }
+
+            console.error('Error loading all rooms:', error);
+            toast.error('Failed to fetch all rooms');
+        }
+    };
+
     useEffect(() => {
-        fetchRoomList();
-    }, []);
+        if (viewAll) {
+            fetchAllRoomList();
+        } else {
+            fetchRoomList();
+        }
+    }, [viewAll]);
+
+    const handleToggleView = () => {
+        setViewAll(!viewAll);
+    };
 
     const [cookies, setCookies] = useCookies(['accessToken']);
     const accessToken = cookies.accessToken;
@@ -68,7 +100,7 @@ const RoomSection = ({ isHome = false }) => {
         try {
             const response = await axios.delete(`${base_url}/rooms/${id}`, {
                 withCredentials: true, // Make sure cookies are sent with the request
-              });
+            });
 
             // After deletion, refetch Room List
             await fetchRoomList();// Assuming fetchRoomList updates state
@@ -101,6 +133,14 @@ const RoomSection = ({ isHome = false }) => {
                         />
                     ))}
                 </div>
+                
+                <button
+                    type="button"
+                    className="min-w-[200px] px-4 py-3 bg-gray-800 hover:bg-gray-900 text-white text-sm font-semibold rounded mt-4"
+                    onClick={handleToggleView}
+                >
+                    {viewAll ? 'View Less' : 'View All'}
+                </button>
             </div>
         </>
     )

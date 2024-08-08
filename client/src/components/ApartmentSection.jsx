@@ -6,11 +6,11 @@ import { AuthContext } from "../utils/AuthContext";
 import PropTypes from "prop-types";
 import axios from 'axios';
 
-const ApartmentSection = ({ isHome = false }) => {
+const ApartmentSection = ({ isHome, key}) => {
 
     const base_url = import.meta.env.VITE_API_URL;
     const [apartments, setApartments] = useState([]);
-    const { authState } = useContext(AuthContext);
+    const {authState } = useContext(AuthContext);
     const [user, setUser] = useState({});
 
     useEffect(() => {
@@ -19,9 +19,19 @@ const ApartmentSection = ({ isHome = false }) => {
         }
     }, [authState]);
 
+    const getUserId = () => {
+        const userId = authState?.user?.id;
+        if (!userId) {
+          return localStorage.getItem('id');
+        }
+        return userId;
+      };
+
     const fetchApartmentList = async () => {
 
-        const url = isHome ? `${base_url}/apartments` : `${base_url}/apartments/manage/${user.id}`;
+        const userId = getUserId();
+
+        const url = isHome ? `${base_url}/apartments` : `${base_url}/apartments/manage/${userId}`;
 
         try {
             // console.log(url);
@@ -51,6 +61,8 @@ const ApartmentSection = ({ isHome = false }) => {
 
     const deleteApartment = async (id) => {
         // Display confirmation dialog
+        // const userId = parseInt(getUserId());
+        const apartmentId = parseInt(id);
 
         if (!authState) {
             console.log("User is not authenticated. Delete Apartment blocked.");
@@ -63,32 +75,39 @@ const ApartmentSection = ({ isHome = false }) => {
             return; // If user cancels, exit the function
         }
 
-        try {
-            const response = await axios.delete(`${base_url}/apartments/${id}`, {
-                data: { user },
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            });
-
-            // After deletion, refetch ingredients
-            await fetchApartmentList();// Assuming fetchIngredients updates state
+        // delete all the managers under this apartment
+        axios.delete(`${base_url}/manageapartments/all`, {
+            data: {apartmentId },
+            withCredentials: true,
+        })
+        .then(() => {
+            // Delete the apartment
+            return axios.delete(`${base_url}/apartments/${apartmentId}`, { withCredentials: true });
+        })
+        .then(() => {
+            // After deletion, refetch apartment list
+            return fetchApartmentList(); // Assuming fetchApartmentList updates state
+        })
+        .then(() => {
             toast.success('Deleted apartment successfully');
-
-        } catch (error) {
+        })
+        .catch(error => {
             console.error('Error deleting apartment:', error);
-            // toast.error('Failed to delete apartment');
-        }
+            toast.error('Failed to delete apartment. Please try again.');
+        });
     };
 
 
     return (
         <>
             <div className="bg-white font-sans p-4">
-                {isHome && (
+                {isHome ? (
                     <h4 className="text-2xl font-bold text-gray-800 mb-4">
                         Latest Apartment
+                    </h4>
+                ) : (
+                    <h4 className="text-2xl font-bold text-gray-800 mb-4">
+                        My Apartment
                     </h4>
                 )}
 

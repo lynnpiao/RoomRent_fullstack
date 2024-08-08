@@ -12,6 +12,8 @@ import HomePage from './pages/HomePage';
 import ApartmentDetail, { apartmentLoader }  from './pages/ApartmentDetail';
 import RoomDetail, {roomLoader} from './pages/RoomDetail';
 import AddRoom from './pages/AddRoom';
+import MyApartments from './pages/MyApartments';
+import EditApartment from './pages/EditApartment';
 import Register from './pages/Reigster';
 import Login from './pages/Login';
 import axios from 'axios';
@@ -77,6 +79,13 @@ const App = () => {
           path='/addroom/:id'
           element={<AddRoom />}
         />
+        <Route path='/myapartments' element={<MyApartments/>} />
+        <Route
+          path='/editapartment/:id'
+          element={<EditApartment />}
+          loader={apartmentLoader}
+        />
+
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         {/* <Route path='*' element={<PageNotFound />} /> */}

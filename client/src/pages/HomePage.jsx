@@ -1,4 +1,4 @@
-import { React, useContext } from 'react';
+import { React, useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../utils/AuthContext';
 import Login from './Login';
@@ -19,12 +19,12 @@ const HomePage = () => {
   const navigateToManageApartments = () => {
     navigate('/myapartments');
   }
-
+  const [refresh, setRefresh] = useState(false);
 
   return (
     <>
 
-      <ApartmentSection isHome={true} />
+      <ApartmentSection isHome={true} key={refresh}/>
       <RoomSection isHome={true} />
 
       <div className="bg-white p-4 font-[sans-serif]">

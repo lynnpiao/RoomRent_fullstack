@@ -1,24 +1,80 @@
 import { useState, useEffect } from "react";
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import PropTypes from "prop-types";
 import { toast } from "react-toastify";
 import axios from "axios";
 
 
-const RoomForm = ({ RoomSubmit, category, isManageable }) => {
+const ApartmentForm = ({ ApartmentSubmit, category, isManageable }) => {
     const base_url = import.meta.env.VITE_API_URL;
     let { id } = useParams();
 
-    // room basic information added 
-    const [aptNumber, setAptNumber] = useState(null);
-    const [sqFeet, setSqFeet] = useState(null);
-    const [type, setType] = useState('');
-    const [availableDate, setAvailableDate] = useState('');
-    const [rentPerMonth, setRentPerMonth] = useState(null);
-    const [floor, setFloor] = useState(null);
-    const [minLeaseLength, setMinLeaseLength] = useState(null);
+    // apartment basic information added 
+    const [name, setName] = useState(null);
+    const [description, setDescription] = useState('');
+    const [address, setAddress] = useState('');
+    const [zipCode, setZipCode] = useState(null);
+    const [contact_email, setContact_email] = useState('');
+    const [contact_phone, setContact_phone] = useState('');
 
-    // room amenities   
+    const validateZipCode = (value) => {
+        const zipCodePattern = /^\d{5}(-\d{4})?$/; // Adjust this pattern as needed for your specific zip code format
+        return zipCodePattern.test(value);
+      };
+    
+      const validateEmail = (value) => {
+        return value.includes('@');
+      };
+    
+      const validatePhone = (value) => {
+        const phonePattern = /^\d{10}$/;
+        return phonePattern.test(value);
+      };
+    
+      const handleZipCodeChange = (e) => {
+        const value = e.target.value;
+        setZipCode(value);
+      
+        if (!value) {
+          // Clear error if zip code is null or empty
+          setErrors(prev => ({ ...prev, zipCode: '' }));
+        } else if (!validateZipCode(value)) {
+          // Set error if zip code is invalid
+          setErrors(prev => ({ ...prev, zipCode: 'Invalid zip code' }));
+        } else {
+          // Clear error if zip code is valid
+          setErrors(prev => ({ ...prev, zipCode: '' }));
+        }
+      };
+    
+      const handleEmailChange = (e) => {
+        const value = e.target.value;
+        setContact_email(value);
+        if (!validateEmail(value)) {
+          setErrors(prev => ({ ...prev, contact_email: 'Invalid email' }));
+        } else {
+          setErrors(prev => ({ ...prev, contact_email: '' }));
+        }
+      };
+    
+      const handlePhoneChange = (e) => {
+        const value = e.target.value;
+        setContact_phone(value);
+      
+        if (!value) {
+          // Clear error if phone number is null or empty
+          setErrors(prev => ({ ...prev, contact_phone: '' }));
+        } else if (!validatePhone(value)) {
+          // Set error if phone number is invalid
+          setErrors(prev => ({ ...prev, contact_phone: 'Invalid phone number' }));
+        } else {
+          // Clear error if phone number is valid
+          setErrors(prev => ({ ...prev, contact_phone: '' }));
+        }
+      };
+
+
+    // apartment amenities   
     const [amenities, setAmenities] = useState([]);
     const [selectedAmenities, setSelectedAmenities] = useState([]);
 
@@ -51,33 +107,28 @@ const RoomForm = ({ RoomSubmit, category, isManageable }) => {
         });
     };
 
-    const submitCreateRoom = async (e) => {
+    const submitCreateApartment = async (e) => {
         e.preventDefault();
 
         if (!isManageable) {
-            console.log("User is not authenticated. Create Room blocked.");
+            console.log("User is not authenticated. Create Apartment blocked.");
             return;
         }
 
-        // Default time to '00:00:00' and format the date
-        const formattedAvailableDate = `${availableDate}T00:00:00Z`;
 
-
-        const newRoom = {
-            aptNumber,
-            sqFeet,
-            type,
-            availableDate:formattedAvailableDate,
-            rentPerMonth,
-            floor,
-            minLeaseLength,
-            apartmentId: id
+        const newApartment = {
+            address,
+            name,
+            description,
+            zipCode,
+            contact_email,
+            contact_phone
         };
 
         try {
             console.log(selectedAmenities);
-            await RoomSubmit({ newRoom, selectedAmenities });
-            console.log("RoomForm Submit Successfully");
+            await ApartmentSubmit({ newApartment, selectedAmenities });
+            console.log("ApartmentForm Submit Successfully");
         } catch (error) {
             console.log(error);
         }
@@ -88,116 +139,98 @@ const RoomForm = ({ RoomSubmit, category, isManageable }) => {
 
     return (
         <>
-            <form onSubmit={submitCreateRoom} className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md space-y-6">
+            <form onSubmit={submitCreateApartment} className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md space-y-6">
                 <div className='bg-white rounded-xl shadow-md'>
-                    <h3 className='text-xl font-bold'> Room Detail</h3>
+                    <h3 className='text-xl font-bold'> Apartment Detail</h3>
                     <div className="flex w-full">
-                        <label htmlFor="aptNumber" className="text-gray-400 w-36 text-sm">
-                            Room No.
+                        <label htmlFor="name" className="text-gray-400 w-36 text-sm">
+                            Apartment Name
                         </label>
                         <input
                             type="text"
-                            id="aptNumber"
-                            value={aptNumber}
-                            onChange={e => setAptNumber(e.target.value)}
+                            id="name"
+                            value={name}
+                            onChange={e => setName(e.target.value)}
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Room No."
+                            placeholder="Apartment Name"
                             required
                         />
                     </div>
 
                     <div className="flex w-full">
-                        <label htmlFor="sqFeet" className="text-gray-400 w-36 text-sm">
-                            Square Feet
+                        <label htmlFor="description" className="text-gray-400 w-36 text-sm">
+                            Description
                         </label>
                         <input
-                            type="number"
-                            id="sqFeet"
-                            value={sqFeet}
-                            min={0}
-                            onChange={e => setSqFeet(e.target.value)}
+                            type="textarea"
+                            id="description"
+                            value={description}
+                            onChange={e => setDescription(e.target.value)}
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Sqft"
+                            placeholder="Description"
                             required
                         />
                     </div>
 
                     <div className="flex w-full">
-                        <label htmlFor="floor" className="text-gray-400 w-36 text-sm">
-                            Floor
+                        <label htmlFor="address" className="text-gray-400 w-36 text-sm">
+                            Address
                         </label>
                         <input
-                            type="number"
-                            id="floor"
-                            value={floor}
-                            min={0}
-                            onChange={e => setFloor(e.target.value)}
+                            type="text"
+                            id="address"
+                            value={address}
+                            onChange={e => setAddress(e.target.value)}
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Floor"
+                            placeholder="Address"
                             required
                         />
                     </div>
 
                     <div className="flex w-full">
-                        <label htmlFor="type" className="text-gray-400 w-36 text-sm">
-                            Type
-                        </label>
-                        <select
-                            id="type"
-                            value={type}
-                            required
-                            onChange={e => setType(e.target.value)}
-                            className="px-2 pt-5 pb-2 bg-white w-full text-sm border-b-2 border-gray-100 focus:border-[#333] outline-none">
-                            <option value="" disabled>Select room type</option>
-                            <option value="Studio/1 Bath">Studio/1 Bath</option>
-                            <option value="1 Bed/1 Bath">1 Bed/1 Bath</option>
-                            <option value="2 Bed/2 Bath">2 Bed/2 Bath</option>
-                        </select>
-                    </div>
-
-                    <div className="flex w-full">
-                        <label htmlFor="availableDate" className="text-gray-400 w-36 text-sm">
-                          Available Date
+                        <label htmlFor="zipCode" className="text-gray-400 w-36 text-sm">
+                            ZipCode
                         </label>
                         <input
-                            type="date"
-                            id="availableDate"
-                            value={availableDate}
-                            onChange={e => setAvailableDate(e.target.value)}
+                            type="text"
+                            id="zipCode"
+                            value={zipCode}
+                            onChange={handleZipCodeChange}
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Available Date"
+                            placeholder="ZipCode"
                         />
                     </div>
 
                     <div className="flex w-full">
-                        <label htmlFor="rentPerMonth" className="text-gray-400 w-36 text-sm">
-                          RentPerMonth
+                        <label htmlFor="contact_email" className="text-gray-400 w-36 text-sm">
+                          Contact Email
                         </label>
                         <input
-                            type="number"
-                            id="rentPerMonth"
-                            value={rentPerMonth}
-                            onChange={e => setRentPerMonth(e.target.value)}
+                            type="text"
+                            id="contact_email"
+                            value={contact_email}
+                            onChange={handleEmailChange}
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Rent"
+                            placeholder="Contact Email"
                             required
                         />
                     </div>
+
                     <div className="flex w-full">
-                        <label htmlFor="minLeaseLength" className="text-gray-400 w-36 text-sm">
-                            Lease Month
+                        <label htmlFor="contact_phone" className="text-gray-400 w-36 text-sm">
+                            Contact Phone
                         </label>
                         <input
-                            type="number"
-                            id="minLeaseLength"
-                            value={minLeaseLength}
-                            min={3}
-                            onChange={e => setMinLeaseLength(e.target.value)}
+                            type="text"
+                            id="contact_phone"
+                            value={contact_phone}
+                            onChange={handlePhoneChange}
                             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                            placeholder="Minimum  Lease Length"
-                            required
+                            placeholder="Contact Phone"
                         />
                     </div>
+
+
                 </div>
                 <br></br>
                 <div className='bg-white rounded-xl shadow-md'>
@@ -228,23 +261,23 @@ const RoomForm = ({ RoomSubmit, category, isManageable }) => {
                     className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">
                     Submit
                 </button>
-                <Link to={`/apartmentdetails/${id}`}>
+                {/* <Link to={`/myapartments`}>
                     <button
-                        type="button"
+                        address="button"
                         className="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">
                         Cancel
                     </button>
-                </Link>
+                </Link> */}
             </form>
         </>
     )
 }
 
 
-RoomForm.propTypes = {
-    RoomSubmit: PropTypes.func.isRequired,
+ApartmentForm.propTypes= {
+    ApartmentSubmit: PropTypes.func.isRequired,
     category: PropTypes.string.isRequired,
     isManageable: PropTypes.bool.isRequired
 };
 
-export default RoomForm
+export default ApartmentForm

@@ -315,6 +315,33 @@ const deleteManageApartment = async (req, res) => {
     }
 }
 
+// 
+const deleteAllManagersByApartment = async (req, res) => {
+    const { apartmentId} = req.body
+
+    try {
+
+        if (isNaN(apartmentId)) {
+            return res.status(400).json({ error: 'Invalid ApartmentId' });
+        }
+
+        const deletedManageApartments = await prisma.manageApartment.deleteMany({
+            where: {
+                apartmentId    
+                
+            },
+        });
+
+        if (!deletedManageApartments) {
+            return res.status(404).json({ error: 'Manage-Apartment relation not found' });
+        }
+        res.status(200).json({ msg: 'Delete Manage-Apartment relation successfully', deletedManageApartments });
+    } catch (error) {
+        res.status(500).json({ msg: error.message })
+    }
+}
+
+
 module.exports = {
     getApartments,
     getApartmentById,
@@ -324,5 +351,6 @@ module.exports = {
     updateApartment: [validatePartialApartment, updateApartment],
     deleteApartment,
     createManageApartment,
-    deleteManageApartment
+    deleteManageApartment,
+    deleteAllManagersByApartment
 };

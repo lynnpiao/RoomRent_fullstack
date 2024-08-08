@@ -9,7 +9,9 @@ const {
     updateApartment,
     deleteApartment,
     createManageApartment,
-    deleteManageApartment } = ApartmentController;
+    deleteManageApartment,
+    deleteAllManagersByApartment } = ApartmentController;
+    
 const { validateToken, validateRole } = require('../middlewares/AuthMiddleware')
 
 const router = express.Router()
@@ -25,5 +27,6 @@ router.post('/manageapartments', validateToken, validateRole('manager'), createM
 router.put('/apartments/:id', validateToken, validateRole('manager'), updateApartment)
 router.delete('/apartments/:id', validateToken, validateRole('manager'), deleteApartment)
 router.delete('/manageapartments', validateToken, validateRole('manager'), deleteManageApartment)
+router.delete('/manageapartments/all', validateToken, validateRole('manager'), deleteAllManagersByApartment)
 
 module.exports = router;

@@ -67,15 +67,11 @@ const RoomSection = ({ isHome = false }) => {
 
         try {
             const response = await axios.delete(`${base_url}/rooms/${id}`, {
-                data: { user },
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${accessToken}`,
-                },
-            });
+                withCredentials: true, // Make sure cookies are sent with the request
+              });
 
-            // After deletion, refetch ingredients
-            await fetchRoomList();// Assuming fetchIngredients updates state
+            // After deletion, refetch Room List
+            await fetchRoomList();// Assuming fetchRoomList updates state
             toast.success('Deleted room successfully');
 
         } catch (error) {

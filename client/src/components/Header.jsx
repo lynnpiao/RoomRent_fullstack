@@ -1,4 +1,4 @@
-import { React, useState, useContext } from 'react'
+import { React, useState, useContext } from 'react';
 import { NavLink, useNavigate } from "react-router-dom";
 import { AuthContext } from '../utils/AuthContext';
 import { useCookies } from "react-cookie";
@@ -7,10 +7,11 @@ import { IoClose } from "react-icons/io5";
 import { FaSearch } from "react-icons/fa";
 
 
-const Header = () => {
+const Header = ({onSearch}) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const {authState, setAuthState } = useContext(AuthContext);
     const [cookies, removeCookie] = useCookies(['accessToken']);
+    const [searchQuery, setSearchQuery] = useState('');
 
 
     const handleClick = () => {
@@ -44,6 +45,14 @@ const Header = () => {
         isActive
             ? 'bg-gray-800 text-white font-medium hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 rounded-lg text-sm px-3 py-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700'
             : 'text-gray-800 hover:bg-gray-900 hover:text-white focus:outline-none focus:ring-4 focus:ring-gray-300 rounded-lg text-sm px-3 py-2 dark:text-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700';
+
+    // searchQuery
+    const handleSearchChange = (e) => {
+        const query = e.target.value;
+        setSearchQuery(query);
+        onSearch(query); 
+
+            };
 
     return (
         <>
@@ -86,7 +95,13 @@ const Header = () => {
                     <div className="flex gap-x-6 gap-y-4 ml-auto">
                         <div
                             className='flex border-2 focus-within:border-gray-400 rounded-full px-6 py-3 overflow-hidden max-w-52 max-lg:hidden'>
-                            <input type='text' placeholder='Search something...' className='w-full text-sm bg-transparent outline-none pr-2' />
+                            <input
+                                type='text'
+                                placeholder='Search related apartments'
+                                className='w-full text-sm bg-transparent outline-none pr-2'
+                                value={searchQuery}
+                                onChange={handleSearchChange}
+                            />
                             <FaSearch />
                         </div>
 

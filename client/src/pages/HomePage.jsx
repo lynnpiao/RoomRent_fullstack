@@ -1,5 +1,5 @@
 import { React, useContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { AuthContext } from '../utils/AuthContext';
 import Login from './Login';
 import ApartmentSection from '../components/ApartmentSection';
@@ -7,9 +7,8 @@ import RoomSection from '../components/RoomSection';
 
 
 const HomePage = () => {
+  const { searchQuery } = useOutletContext();
   const { authState } = useContext(AuthContext);
-
-
   const navigate = useNavigate();
 
   const navigateToLikedRooms = () => {
@@ -24,7 +23,7 @@ const HomePage = () => {
   return (
     <>
 
-      <ApartmentSection isHome={true} key={refresh}/>
+      <ApartmentSection isHome={true} key={refresh} searchQuery={searchQuery} />
       <RoomSection isHome={true} />
 
       <div className="bg-white p-4 font-[sans-serif]">

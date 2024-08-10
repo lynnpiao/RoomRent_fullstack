@@ -4,7 +4,7 @@ const { validateApartment, validatePartialApartment } = require('../middlewares/
 const prisma = new PrismaClient()
 
 
-// get lastest  apartments
+// get lastest apartments
 
 const getApartments = async (req, res) => {
     try {

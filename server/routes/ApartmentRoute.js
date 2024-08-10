@@ -22,13 +22,13 @@ const router = express.Router()
 router.get('/apartments', getApartments)
 router.get('/apartments/all', getAllApartments)
 router.get('/apartments/:id', getApartmentById) 
-router.get('/apartments/room/:roomId', getApartmentByRoom) 
+router.get('/apartments/room/:roomId', getApartmentByRoom) // not use 
 router.get('/apartments/manage/:userId', getApartmentsByManager)
 router.post('/apartments', validateToken, validateRole('manager'), createApartment)
 router.post('/manageapartments', validateToken, validateRole('manager'), createManageApartment)
 router.put('/apartments/:id', validateToken, validateRole('manager'), updateApartment)
 router.delete('/apartments/:id', validateToken, validateRole('manager'), deleteApartment)
-router.delete('/manageapartments', validateToken, validateRole('manager'), deleteManageApartment)
+router.delete('/manageapartments', validateToken, validateRole('manager'), deleteManageApartment) // not use 
 router.delete('/manageapartments/all', validateToken, validateRole('manager'), deleteAllManagersByApartment)
 
 module.exports = router;

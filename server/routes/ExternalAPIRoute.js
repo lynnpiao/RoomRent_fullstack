@@ -6,7 +6,7 @@ const { getApartmentImage, getApartmentMap
 const router = express.Router()
 
 
-router.post('/apartment_image', getApartmentImage)
+router.post('/apartment_image', getApartmentImage) 
 router.post('/apartment_map', getApartmentMap)
 
 

@@ -6,7 +6,7 @@ import { AuthContext } from "../utils/AuthContext";
 import PropTypes from "prop-types";
 import axios from 'axios';
 
-const ApartmentSection = ({ isHome }) => {
+const ApartmentSection = ({ isHome=false, searchQuery=''}) => {
 
     const base_url = import.meta.env.VITE_API_URL;
     const [apartments, setApartments] = useState([]);
@@ -73,6 +73,18 @@ const ApartmentSection = ({ isHome }) => {
         }
     }, [viewAll]);
 
+
+    // Filter apartments based on the search query
+const filteredApartments = apartments.filter((apartment) => {
+    const searchLower = searchQuery.toLowerCase();
+    return (
+        apartment.name.toLowerCase().includes(searchLower) ||
+        apartment.description.toLowerCase().includes(searchLower) ||
+        apartment.address.toLowerCase().includes(searchLower)
+    );
+});
+
+
     const [cookies, setCookies] = useCookies(['accessToken']);
     const accessToken = cookies.accessToken;
 
@@ -126,7 +138,7 @@ const ApartmentSection = ({ isHome }) => {
             )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                {apartments.map((apartment, index) => (
+                {filteredApartments.map((apartment, index) => (
                     <ApartmentCard
                         key={index}
                         apartment={apartment}
@@ -134,6 +146,10 @@ const ApartmentSection = ({ isHome }) => {
                         isHome={isHome}
                     />
                 ))}
+
+                {filteredApartments.length === 0 && (
+                <p className="text-gray-500 mt-4">No apartments found matching your search.</p>
+            )}
             </div>
 
             <button
@@ -148,7 +164,8 @@ const ApartmentSection = ({ isHome }) => {
 }
 
 ApartmentSection.propTypes = {
-    isHome: PropTypes.bool.isRequired
+    isHome: PropTypes.bool.isRequired,
+    searchQuery: PropTypes.string, 
 };
 
 export default ApartmentSection;

@@ -14,6 +14,8 @@ import RoomDetail, {roomLoader} from './pages/RoomDetail';
 import AddRoom from './pages/AddRoom';
 import MyApartments from './pages/MyApartments';
 import EditApartment from './pages/EditApartment';
+import EditRoom from './pages/EditRoom';
+import LikedRoom from './pages/LikedRoom';
 import Register from './pages/Reigster';
 import Login from './pages/Login';
 import axios from 'axios';
@@ -85,7 +87,13 @@ const App = () => {
           element={<EditApartment />}
           loader={apartmentLoader}
         />
+        <Route
+          path='/editroom/:id'
+          element={<EditRoom />}
+          loader={roomLoader}
+        />
 
+        <Route path='/mylikes' element={<LikedRoom/>} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         {/* <Route path='*' element={<PageNotFound />} /> */}

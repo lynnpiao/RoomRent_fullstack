@@ -7,7 +7,7 @@ import { AuthContext } from "../utils/AuthContext";
 import PropTypes from "prop-types";
 import axios from 'axios';
 
-const RoomSection = ({ isHome = false }) => {
+const RoomSection = ({ isHome = false}) => {
 
     const base_url = import.meta.env.VITE_API_URL;
     const [rooms, setRooms] = useState([]);

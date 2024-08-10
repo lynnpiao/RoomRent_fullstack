@@ -1,5 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
-const {validateRoom, validatePartialRoom} = require('../middlewares/SchemaMiddleware')
+const { validateRoom, validatePartialRoom } = require('../middlewares/SchemaMiddleware')
 const prisma = new PrismaClient();
 const Joi = require('joi');
 
@@ -112,7 +112,9 @@ const getRoomById = async (req, res) => {
                                 }
                             }
                         }
-                    }}}
+                    }
+                }
+            }
         });
 
         if (!room) {
@@ -186,6 +188,64 @@ const getRoomsByApartment = async (req, res) => {
 };
 
 
+// get Rooms by Liked Info 
+
+const getRoomsByLikes = async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        if (isNaN(parseInt(userId))) {
+            return res.status(400).json({ msg: 'User ID must be a valid number.' });
+        }
+
+        // Find liked rooms by userId
+        const likedRooms = await prisma.room.findMany({
+            where: {
+                likes: {
+                    some: {
+                        userId: parseInt(userId)
+                    }
+                }
+            },
+            include: {
+                apartment: {
+                    include: {
+                        managers: {
+                            include: {
+                                user: {
+                                    select: {
+                                        email: true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Check if any liked rooms were found
+        if (!likedRooms || likedRooms.length === 0) {
+            return res.status(404).json({ msg: 'No liked rooms found for this user.' });
+        }
+
+        const roomsWithApartment = likedRooms.map(room => ({
+            ...room,
+            apartmentName: room.apartment ? room.apartment.name : null,
+            contact_email: room.apartment ? room.apartment.contact_email : null,
+            address: room.apartment ? room.apartment.address : null,
+            managerEmails: room.apartment ? room.apartment.managers.map(manager => manager.user.email) : []
+        }));
+
+        res.status(200).json(roomsWithApartment);
+
+    } catch (error) {
+        res.status(500).json({ msg: error.message })
+    }
+
+};
+
+
 // Define Joi schema for validation
 const amenityIdsSchema = Joi.array().items(Joi.number().integer().required()).min(1);
 
@@ -200,7 +260,7 @@ const getRoomsByAmenities = async (req, res) => {
         if (error) {
             return res.status(400).json({ msg: 'Invalid request data.', error: error.details[0].message });
         }
-        
+
         // Fetch rooms based on amenity IDs
         const rooms = await prisma.room.findMany({
             where: {
@@ -226,7 +286,8 @@ const getRoomsByAmenities = async (req, res) => {
                         }
                     },
 
-            }}
+                }
+            }
         });
 
         if (!rooms || rooms.length === 0) {
@@ -345,16 +406,16 @@ const createRoom = async (req, res) => {
 const updateRoom = async (req, res) => {
     const id = req.params.id;
     const idInt = parseInt(id);
-    const {availableDate, rentPerMonth, minLeaseLength} = req.body
+    const { availableDate, rentPerMonth, minLeaseLength } = req.body
 
     try {
-        if (isNaN(idInt) || idInt <= 0 ) {
+        if (isNaN(idInt) || idInt <= 0) {
             return res.status(400).json({ error: 'Invalid RoomId' });
         }
 
         const updatedRoom = await prisma.room.update({
             where: {
-                    id: idInt,
+                id: idInt,
             },
             data: {
                 availableDate: availableDate || new Date(),
@@ -362,7 +423,7 @@ const updateRoom = async (req, res) => {
                 minLeaseLength: parseInt(minLeaseLength) || null
             },
         })
-        res.status(200).json({ msg: 'Room updated successfully', updatedRoom})
+        res.status(200).json({ msg: 'Room updated successfully', updatedRoom })
     } catch (error) {
         res.status(500).json({ msg: error.message })
     }
@@ -401,6 +462,7 @@ module.exports = {
     getAllRooms,
     getRoomById,
     getRoomsByApartment,
+    getRoomsByLikes,
     getRoomsByAmenities,
     getRoomsByAttributes,
     createRoom: [validateRoom, createRoom],

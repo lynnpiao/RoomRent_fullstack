@@ -2,6 +2,7 @@ import { useState } from "react";
 import React from 'react'
 import { MdOutlineNavigateNext } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { FaRegEdit } from "react-icons/fa";
 import PropTypes from "prop-types";
 
 const ApartmentRoomList = ({ rooms }) => {
@@ -61,9 +62,15 @@ const ApartmentRoomList = ({ rooms }) => {
                     >
                         <div className="p-6 bg-white flex justify-between items-center">
                             <div>
-                                <h3 className="text-lg font-bold text-gray-800">{room.type}</h3>
+                                <h3 className="text-lg font-bold text-gray-800">{room.type}</h3> <span> <button
+                                    type="button"   
+                                    onClick={()=>{navigate(`/editroom/${room.id}`);}}
+                                    className='text-indigo-500 mb-5 hover:text-indigo-600 text-md font-bold'>
+                                    <FaRegEdit />
+                                </button></span>
                                 <h4 className="text-lg text-gray-800 font-bold mt-2">${room.rentPerMonth}</h4>
                                 <p className="text-gray-600 text-sm mt-2">{room.sqFeet} sqft / Unit No.{room.aptNumber}</p>
+                                
                             </div>
                             
                                 <button
